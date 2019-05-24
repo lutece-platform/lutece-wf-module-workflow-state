@@ -4,6 +4,8 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd" >
 
-
-
+	<!-- DAOs -->
+	<bean id="workflow-state.chooseStateTaskConfigDao" class="fr.paris.lutece.plugins.workflow.modules.state.business.config.ChooseStateTaskConfigDao" />
+	<bean id="workflow-state.chooseStateTaskInformationDao" class="fr.paris.lutece.plugins.workflow.modules.state.business.information.ChooseStateTaskInformationDAO" />
+	
 </beans>
