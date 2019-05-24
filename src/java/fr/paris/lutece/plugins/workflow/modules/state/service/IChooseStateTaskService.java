@@ -4,6 +4,7 @@ import java.util.List;
 
 import fr.paris.lutece.plugins.workflow.modules.state.business.config.ChooseStateTaskConfig;
 import fr.paris.lutece.plugins.workflow.modules.state.util.IResourceController;
+import fr.paris.lutece.plugins.workflowcore.business.resource.ResourceWorkflow;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
 import fr.paris.lutece.util.ReferenceList;
 
@@ -33,4 +34,22 @@ public interface IChooseStateTaskService {
      * @return
      */
     ChooseStateTaskConfig loadConfig( ITask task );
+    
+    /**
+     * Get the controller defined in the config.
+     * @return
+     */
+    IResourceController getController( ChooseStateTaskConfig config );
+    
+    /**
+     * Change resource state.
+     * @param task
+     * @param nIdResource
+     * @param strResourceType
+     * @param nIdWorkflow
+     * @param newState
+     */
+    void doChangeState( ITask task, int nIdResource, String strResourceType, int nIdWorkflow, int newState );
+    
+    ResourceWorkflow getResourceByHistory( int nIdHistory, int nIdWorkflow );
 }

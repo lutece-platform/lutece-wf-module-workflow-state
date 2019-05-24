@@ -21,8 +21,8 @@ public interface IResourceController {
 	String getName( );
 	
 	/**
-	 * controls the resource.
+	 * controls the result of the control.
 	 * @return
 	 */
-	boolean control( int nIdResourceHistory );
+	boolean control( int nIdResource, String strResourceType );
 }
