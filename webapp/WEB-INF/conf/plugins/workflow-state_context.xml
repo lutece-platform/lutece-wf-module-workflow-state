@@ -2,10 +2,15 @@
 
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd" >
 
 	<!-- DAOs -->
 	<bean id="workflow-state.chooseStateTaskConfigDao" class="fr.paris.lutece.plugins.workflow.modules.state.business.config.ChooseStateTaskConfigDao" />
 	<bean id="workflow-state.chooseStateTaskInformationDao" class="fr.paris.lutece.plugins.workflow.modules.state.business.information.ChooseStateTaskInformationDAO" />
 	
+	<!-- Services -->
+	<bean id="workflow-state.chooseStateTaskService" class="fr.paris.lutece.plugins.workflow.modules.state.service.ChooseStateTaskService" />
+	<bean id="workflow-state.chooseStateTaskConfigService" class="fr.paris.lutece.plugins.workflowcore.service.config.TaskConfigService" 
+		p:taskConfigDAO-ref="workflow-state.chooseStateTaskConfigDao" />
 </beans>
