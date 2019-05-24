@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd" >
+
+	<!-- DAOs -->
+	<bean id="workflow-state.chooseStateTaskConfigDao" class="fr.paris.lutece.plugins.workflow.modules.state.business.config.ChooseStateTaskConfigDao" />
+	<bean id="workflow-state.chooseStateTaskInformationDao" class="fr.paris.lutece.plugins.workflow.modules.state.business.information.ChooseStateTaskInformationDAO" />
+	
+	<!-- Services -->
+	<bean id="workflow-state.chooseStateTaskService" class="fr.paris.lutece.plugins.workflow.modules.state.service.ChooseStateTaskService" />
+	<bean id="workflow-state.chooseStateTaskConfigService" class="fr.paris.lutece.plugins.workflowcore.service.config.TaskConfigService" 
+		p:taskConfigDAO-ref="workflow-state.chooseStateTaskConfigDao" />
+		
+	<!-- Task -->
+	<bean id="workflow-state.chooseStateTask"
+		class="fr.paris.lutece.plugins.workflow.modules.state.service.task.ChooseStateTask" scope="prototype" />
+	<bean id="workflow-state.chooseStateTaskConfig"
+		class="fr.paris.lutece.plugins.workflow.modules.state.business.config.ChooseStateTaskConfig" scope="prototype" />
+		
+	<bean id="workflow-state.chooseStateTaskType" class="fr.paris.lutece.plugins.workflowcore.business.task.TaskType"
+	        p:key="chooseStateTask"
+	        p:titleI18nKey="module.workflow.state.task.choose.state.title"
+	        p:beanName="workflow-state.chooseStateTask"
+	        p:configBeanName="workflow-state.chooseStateTaskConfig"
+	        p:configRequired="true"
+	        p:taskForAutomaticAction="true" />
+	
+	<bean id="workflow-state.chooseStateTaskComponent" class="fr.paris.lutece.plugins.workflow.modules.state.web.task.ChooseStateTaskComponent"
+		p:taskType-ref="workflow-state.chooseStateTaskType"
+		p:taskConfigService-ref="workflow-state.chooseStateTaskConfigService" />
+</beans>
