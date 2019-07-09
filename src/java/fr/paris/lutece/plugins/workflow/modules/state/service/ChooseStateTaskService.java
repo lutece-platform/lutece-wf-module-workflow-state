@@ -24,9 +24,9 @@ import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceHistorySer
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceWorkflowService;
 import fr.paris.lutece.plugins.workflowcore.service.state.IStateService;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
-import fr.paris.lutece.plugins.workflowcore.service.workflow.IWorkflowService;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.portal.service.workflow.WorkflowService;
 import fr.paris.lutece.util.ReferenceList;
 
 /**
@@ -53,9 +53,6 @@ public class ChooseStateTaskService implements IChooseStateTaskService {
 	@Inject
 	@Named("workflow-state.chooseStateTaskConfigService")
 	private ITaskConfigService _taskConfigService;
-	
-	@Inject
-	private IWorkflowService _workflowService;
 	
 	@Override
 	public ReferenceList getListStates(int nIdAction)
@@ -139,7 +136,7 @@ public class ChooseStateTaskService implements IChooseStateTaskService {
 			saveTaskInformation( resourceHistory.getId( ), task, state );
 			// Execute the relative tasks of the state in the workflow
 			// We use AutomaticReflexiveActions because we don't want to change the state of the resource by executing actions.
-			_workflowService.doProcessAutomaticReflexiveActions( nIdResource, strResourceType, state.getId( ),
+			WorkflowService.getInstance( ).doProcessAutomaticReflexiveActions( nIdResource, strResourceType, state.getId( ),
                         null, locale );
 		}
     }
