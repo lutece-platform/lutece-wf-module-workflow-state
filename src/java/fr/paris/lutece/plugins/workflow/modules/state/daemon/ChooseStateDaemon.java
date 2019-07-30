@@ -17,6 +17,7 @@ import fr.paris.lutece.plugins.workflowcore.service.workflow.IWorkflowService;
 import fr.paris.lutece.plugins.workflowcore.service.workflow.WorkflowService;
 import fr.paris.lutece.portal.service.daemon.Daemon;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 
 public class ChooseStateDaemon extends Daemon {
 
@@ -50,8 +51,14 @@ public class ChooseStateDaemon extends Daemon {
                 
                 for ( ResourceWorkflow resource : listResource )
                 {
-                	_chooseStateTask.chooseNewState( resource.getIdResource( ), resource.getResourceType( ), action.getId( ), workflow.getId( ), resource.getState( ).getId( ) );
-                	
+                	try
+                	{
+                		_chooseStateTask.chooseNewState( resource.getIdResource( ), resource.getResourceType( ), action.getId( ), workflow.getId( ), resource.getState( ).getId( ) );
+                	}
+                	catch ( Exception e )
+                	{
+                		AppLogService.error( "Unexpected Error", e );
+					}
                 }
             }
         }
