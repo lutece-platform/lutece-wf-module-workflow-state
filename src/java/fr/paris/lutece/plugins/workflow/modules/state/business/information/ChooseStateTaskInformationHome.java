@@ -2,18 +2,19 @@ package fr.paris.lutece.plugins.workflow.modules.state.business.information;
 
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 
-public final class ChooseStateTaskInformationHome {
+public final class ChooseStateTaskInformationHome
+{
 
-	private static IChooseStateTaskInformationDAO _dao = SpringContextService.getBean( "workflow-state.chooseStateTaskInformationDao" );
-	
-	/**
+    private static IChooseStateTaskInformationDAO _dao = SpringContextService.getBean( "workflow-state.chooseStateTaskInformationDao" );
+
+    /**
      * Private constructor
      */
     private ChooseStateTaskInformationHome( )
     {
         super( );
     }
-    
+
     /**
      * Creates a task information
      * 

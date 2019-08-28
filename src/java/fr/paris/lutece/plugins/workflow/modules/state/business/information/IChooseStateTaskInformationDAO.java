@@ -1,9 +1,9 @@
 package fr.paris.lutece.plugins.workflow.modules.state.business.information;
 
+public interface IChooseStateTaskInformationDAO
+{
 
-public interface IChooseStateTaskInformationDAO {
-
-	  /**
+    /**
      * Inserts a new record in the table.
      * 
      * @param taskInformation

@@ -32,32 +32,33 @@ import fr.paris.lutece.util.ReferenceList;
 /**
  * Implements IChooseStateTaskService
  */
-public class ChooseStateTaskService implements IChooseStateTaskService {
+public class ChooseStateTaskService implements IChooseStateTaskService
+{
 
-	private static final String USER_AUTO = "auto";
-	
-	private static List<IResourceController> _controllerList;
-	
-	@Inject
+    private static final String USER_AUTO = "auto";
+
+    private static List<IResourceController> _controllerList;
+
+    @Inject
     private IResourceHistoryService _resourceHistoryService;
-	
-	@Inject
+
+    @Inject
     private IResourceWorkflowService _resourceWorkflowService;
-	
-	@Inject
+
+    @Inject
     private IActionService _actionService;
-	
-	@Inject
+
+    @Inject
     private IStateService _stateService;
-	
-	@Inject
-	@Named("workflow-state.chooseStateTaskConfigService")
-	private ITaskConfigService _taskConfigService;
-	
-	@Override
-	public ReferenceList getListStates(int nIdAction)
-	{
-		ReferenceList referenceListStates = new ReferenceList( );
+
+    @Inject
+    @Named( "workflow-state.chooseStateTaskConfigService" )
+    private ITaskConfigService _taskConfigService;
+
+    @Override
+    public ReferenceList getListStates( int nIdAction )
+    {
+        ReferenceList referenceListStates = new ReferenceList( );
         Action action = _actionService.findByPrimaryKey( nIdAction );
 
         if ( ( action != null ) && ( action.getWorkflow( ) != null ) )
@@ -72,98 +73,99 @@ public class ChooseStateTaskService implements IChooseStateTaskService {
         }
 
         return referenceListStates;
-	}
-	
-	@Override
-	public List<IResourceController> getControllerList( )
-	{
-		if ( _controllerList == null )
-		{
-			_controllerList = initControllerList();
-		}
-		return _controllerList;
-	}
-	
-	@Override
-	public ChooseStateTaskConfig loadConfig( ITask task )
-	{
-		ChooseStateTaskConfig config = _taskConfigService.findByPrimaryKey( task.getId( ) );
-		if ( config == null )
-		{
-			config = new ChooseStateTaskConfig( );
-			config.setIdTask( task.getId( ) );
-			_taskConfigService.create( config );
-		}
-		return config;
-	}
-	
-	@Override
-	public IResourceController getController(ChooseStateTaskConfig config) {
-		for ( IResourceController controller : getControllerList( ) )
-		{
-			if ( controller.getName( ).equals(config.getControllerName( ) ) )
-			{
-				return controller;
-			}
-		}
-		return null;
-	}
-	
-	@Override
-	public void doChangeState( ITask task, int nIdResource, String strResourceType, int nIdWorkflow, int newState )
-    {
-		Locale locale = I18nService.getDefaultLocale( );
-		State state = _stateService.findByPrimaryKey( newState );
-		Action action = _actionService.findByPrimaryKey( task.getAction( ).getId( ) );
-
-		if ( state != null && action != null )
-		{
-
-			// Create Resource History
-			ResourceHistory resourceHistory = new ResourceHistory( );
-			resourceHistory.setIdResource( nIdResource );
-			resourceHistory.setResourceType( strResourceType );
-			resourceHistory.setAction( action );
-			resourceHistory.setWorkFlow( action.getWorkflow( ) );
-			resourceHistory.setCreationDate( WorkflowUtils.getCurrentTimestamp( ) );
-			resourceHistory.setUserAccessCode( USER_AUTO );
-			_resourceHistoryService.create( resourceHistory );
-
-			// Update Resource
-			ResourceWorkflow resourceWorkflow = _resourceWorkflowService.findByPrimaryKey( nIdResource, strResourceType, nIdWorkflow );
-			resourceWorkflow.setState( state );
-			_resourceWorkflowService.update( resourceWorkflow );
-			saveTaskInformation( resourceHistory.getId( ), task, state );
-			// Execute the relative tasks of the state in the workflow
-			// We use AutomaticReflexiveActions because we don't want to change the state of the resource by executing actions.
-			WorkflowService.getInstance( ).doProcessAutomaticReflexiveActions( nIdResource, strResourceType, state.getId( ),
-                        null, locale );
-		}
     }
-	
-	private void saveTaskInformation(int nIdResourceHistory, ITask task, State state ) {
-		ChooseStateTaskInformation taskInformation = new ChooseStateTaskInformation( );
-		taskInformation.setIdHistory( nIdResourceHistory );
-		taskInformation.setIdTask( task.getId( ) );
-		taskInformation.setNewState( state.getName( ) );
-        
-		ChooseStateTaskInformationHome.create( taskInformation );
-	}
-	
-	@Override
-	public ResourceWorkflow getResourceByHistory( int nIdHistory, int nIdWorkflow )
-	{
-		ResourceWorkflow resourceWorkflow = null;
-		ResourceHistory resourceHistory =  _resourceHistoryService.findByPrimaryKey( nIdHistory );
-		if ( resourceHistory != null )
-		{
-			resourceWorkflow = _resourceWorkflowService.findByPrimaryKey( resourceHistory.getIdResource( ), resourceHistory.getResourceType( ), nIdWorkflow );
-		}
-		return resourceWorkflow;
-	}
-	
-	private static List<IResourceController> initControllerList( )
-	{
-		return SpringContextService.getBeansOfType( IResourceController.class );
-	}
+
+    @Override
+    public List<IResourceController> getControllerList( )
+    {
+        if ( _controllerList == null )
+        {
+            _controllerList = initControllerList( );
+        }
+        return _controllerList;
+    }
+
+    @Override
+    public ChooseStateTaskConfig loadConfig( ITask task )
+    {
+        ChooseStateTaskConfig config = _taskConfigService.findByPrimaryKey( task.getId( ) );
+        if ( config == null )
+        {
+            config = new ChooseStateTaskConfig( );
+            config.setIdTask( task.getId( ) );
+            _taskConfigService.create( config );
+        }
+        return config;
+    }
+
+    @Override
+    public IResourceController getController( ChooseStateTaskConfig config )
+    {
+        for ( IResourceController controller : getControllerList( ) )
+        {
+            if ( controller.getName( ).equals( config.getControllerName( ) ) )
+            {
+                return controller;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void doChangeState( ITask task, int nIdResource, String strResourceType, int nIdWorkflow, int newState )
+    {
+        Locale locale = I18nService.getDefaultLocale( );
+        State state = _stateService.findByPrimaryKey( newState );
+        Action action = _actionService.findByPrimaryKey( task.getAction( ).getId( ) );
+
+        if ( state != null && action != null )
+        {
+
+            // Create Resource History
+            ResourceHistory resourceHistory = new ResourceHistory( );
+            resourceHistory.setIdResource( nIdResource );
+            resourceHistory.setResourceType( strResourceType );
+            resourceHistory.setAction( action );
+            resourceHistory.setWorkFlow( action.getWorkflow( ) );
+            resourceHistory.setCreationDate( WorkflowUtils.getCurrentTimestamp( ) );
+            resourceHistory.setUserAccessCode( USER_AUTO );
+            _resourceHistoryService.create( resourceHistory );
+
+            // Update Resource
+            ResourceWorkflow resourceWorkflow = _resourceWorkflowService.findByPrimaryKey( nIdResource, strResourceType, nIdWorkflow );
+            resourceWorkflow.setState( state );
+            _resourceWorkflowService.update( resourceWorkflow );
+            saveTaskInformation( resourceHistory.getId( ), task, state );
+            // Execute the relative tasks of the state in the workflow
+            // We use AutomaticReflexiveActions because we don't want to change the state of the resource by executing actions.
+            WorkflowService.getInstance( ).doProcessAutomaticReflexiveActions( nIdResource, strResourceType, state.getId( ), null, locale );
+        }
+    }
+
+    private void saveTaskInformation( int nIdResourceHistory, ITask task, State state )
+    {
+        ChooseStateTaskInformation taskInformation = new ChooseStateTaskInformation( );
+        taskInformation.setIdHistory( nIdResourceHistory );
+        taskInformation.setIdTask( task.getId( ) );
+        taskInformation.setNewState( state.getName( ) );
+
+        ChooseStateTaskInformationHome.create( taskInformation );
+    }
+
+    @Override
+    public ResourceWorkflow getResourceByHistory( int nIdHistory, int nIdWorkflow )
+    {
+        ResourceWorkflow resourceWorkflow = null;
+        ResourceHistory resourceHistory = _resourceHistoryService.findByPrimaryKey( nIdHistory );
+        if ( resourceHistory != null )
+        {
+            resourceWorkflow = _resourceWorkflowService.findByPrimaryKey( resourceHistory.getIdResource( ), resourceHistory.getResourceType( ), nIdWorkflow );
+        }
+        return resourceWorkflow;
+    }
+
+    private static List<IResourceController> initControllerList( )
+    {
+        return SpringContextService.getBeansOfType( IResourceController.class );
+    }
 }
