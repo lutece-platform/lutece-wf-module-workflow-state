@@ -41,5 +41,11 @@
         <componentName>workflowstate</componentName>
         <jiraProjectName>WORKFLOWSTATE</jiraProjectName>
         <jiraComponentId></jiraComponentId>
-    </properties>
+   </properties>
+   <scm>
+        <connection>scm:git:https://github.com/lutece-platform/lutece-wf-module-workflow-state.git</connection>
+        <developerConnection>scm:git:https://github.com/lutece-platform/lutece-wf-module-workflow-state.git</developerConnection>
+        <url>https://github.com/lutece-platform/lutece-wf-module-workflow-state.git</url>
+      <tag>HEAD</tag>
+    </scm>
 </project>
