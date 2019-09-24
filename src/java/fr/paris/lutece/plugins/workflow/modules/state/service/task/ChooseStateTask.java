@@ -1,6 +1,5 @@
 package fr.paris.lutece.plugins.workflow.modules.state.service.task;
 
-import java.util.List;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -10,17 +9,12 @@ import fr.paris.lutece.plugins.workflow.modules.state.business.config.ChooseStat
 import fr.paris.lutece.plugins.workflow.modules.state.service.IChooseStateTaskService;
 import fr.paris.lutece.plugins.workflow.modules.state.util.IResourceController;
 import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
-import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
 import fr.paris.lutece.plugins.workflowcore.service.task.SimpleTask;
 import fr.paris.lutece.portal.service.i18n.I18nService;
 
 public class ChooseStateTask extends SimpleTask
 {
-
     private static final String MESSAGE_MARK_TITLE = "module.workflow.state.task.choose.state.title";
-
-    @Inject
-    private ITaskService _taskService;
 
     @Inject
     private IChooseStateTaskService _chooseStateTaskService;
@@ -30,40 +24,23 @@ public class ChooseStateTask extends SimpleTask
     {
     }
 
-    public void chooseNewState( int nIdResource, String strResourceType, int nIdAction, int nIdWorkflow, int oldState )
+    public void chooseNewState( int nIdResource, String strResourceType, ITask task, ChooseStateTaskConfig config, int nIdWorkflow, int oldState )
     {
-        ITask task = null;
-        List<ITask> listActionTasks = _taskService.getListTaskByIdAction( nIdAction, Locale.getDefault( ) );
+        IResourceController controller = _chooseStateTaskService.getController( config );
 
-        for ( ITask tsk : listActionTasks )
+        int newState = -1;
+        if ( controller.control( nIdResource, strResourceType ) )
         {
-            if ( tsk.getTaskType( ) != null && tsk.getTaskType( ).getBeanName( ) != null
-                    && tsk.getTaskType( ).getBeanName( ).equals( "workflow-state.chooseStateTask" ) )
-            {
-                task = tsk;
-            }
+            newState = config.getIdStateOK( );
+        }
+        else
+        {
+            newState = config.getIdStateKO( );
         }
 
-        if ( task != null )
+        if ( newState != -1 && newState != oldState )
         {
-            ChooseStateTaskConfig config = _chooseStateTaskService.loadConfig( task );
-
-            IResourceController controller = _chooseStateTaskService.getController( config );
-
-            int newState = -1;
-            if ( controller.control( nIdResource, strResourceType ) )
-            {
-                newState = config.getIdStateOK( );
-            }
-            else
-            {
-                newState = config.getIdStateKO( );
-            }
-
-            if ( newState != -1 && newState != oldState )
-            {
-                _chooseStateTaskService.doChangeState( task, nIdResource, strResourceType, nIdWorkflow, newState );
-            }
+            _chooseStateTaskService.doChangeState( task, nIdResource, strResourceType, nIdWorkflow, newState );
         }
     }
 

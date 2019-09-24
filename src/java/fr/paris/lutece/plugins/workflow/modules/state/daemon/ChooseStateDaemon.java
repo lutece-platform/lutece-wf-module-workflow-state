@@ -1,7 +1,10 @@
 package fr.paris.lutece.plugins.workflow.modules.state.daemon;
 
 import java.util.List;
+import java.util.Locale;
 
+import fr.paris.lutece.plugins.workflow.modules.state.business.config.ChooseStateTaskConfig;
+import fr.paris.lutece.plugins.workflow.modules.state.service.IChooseStateTaskService;
 import fr.paris.lutece.plugins.workflow.modules.state.service.task.ChooseStateTask;
 import fr.paris.lutece.plugins.workflowcore.business.action.Action;
 import fr.paris.lutece.plugins.workflowcore.business.action.ActionFilter;
@@ -13,6 +16,9 @@ import fr.paris.lutece.plugins.workflowcore.service.action.ActionService;
 import fr.paris.lutece.plugins.workflowcore.service.action.IActionService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.IResourceWorkflowService;
 import fr.paris.lutece.plugins.workflowcore.service.resource.ResourceWorkflowService;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITask;
+import fr.paris.lutece.plugins.workflowcore.service.task.ITaskService;
+import fr.paris.lutece.plugins.workflowcore.service.task.TaskService;
 import fr.paris.lutece.plugins.workflowcore.service.workflow.IWorkflowService;
 import fr.paris.lutece.plugins.workflowcore.service.workflow.WorkflowService;
 import fr.paris.lutece.portal.service.daemon.Daemon;
@@ -23,9 +29,11 @@ public class ChooseStateDaemon extends Daemon
 {
 
     private ChooseStateTask _chooseStateTask = SpringContextService.getBean( "workflow-state.chooseStateTask" );
+    private IChooseStateTaskService _chooseStateTaskService = SpringContextService.getBean( "workflow-state.chooseStateTaskService" );
     private IWorkflowService _workflowService = SpringContextService.getBean( WorkflowService.BEAN_SERVICE );
     private IResourceWorkflowService _resourceWorkflowService = SpringContextService.getBean( ResourceWorkflowService.BEAN_SERVICE );
     private IActionService _actionService = SpringContextService.getBean( ActionService.BEAN_SERVICE );
+    private ITaskService _taskService = SpringContextService.getBean( TaskService.BEAN_SERVICE );
 
     @Override
     public void run( )
@@ -48,20 +56,37 @@ public class ChooseStateDaemon extends Daemon
                 ResourceWorkflowFilter filt = new ResourceWorkflowFilter( );
                 filt.setIdState( action.getStateBefore( ).getId( ) );
                 filt.setIdWorkflow( workflow.getId( ) );
-
-                List<ResourceWorkflow> listResource = _resourceWorkflowService.getListResourceWorkflowByFilter( filt );
-
-                for ( ResourceWorkflow resource : listResource )
+                
+                ITask task = null;
+                List<ITask> listActionTasks = _taskService.getListTaskByIdAction( action.getId( ), Locale.getDefault( ) );
+                
+                for ( ITask tsk : listActionTasks )
                 {
-                    try
+                    if ( tsk.getTaskType( ) != null && tsk.getTaskType( ).getBeanName( ) != null
+                            && tsk.getTaskType( ).getBeanName( ).equals( "workflow-state.chooseStateTask" ) )
                     {
-                        _chooseStateTask.chooseNewState( resource.getIdResource( ), resource.getResourceType( ), action.getId( ), workflow.getId( ), resource
-                                .getState( ).getId( ) );
+                        task = tsk;
                     }
-                    catch( Exception e )
-                    {
-                        AppLogService.error( "Unexpected Error", e );
-                    }
+                }
+                
+                if ( task != null )
+                {
+                	ChooseStateTaskConfig config = _chooseStateTaskService.loadConfig( task );
+                	
+	                List<ResourceWorkflow> listResource = _resourceWorkflowService.getListResourceWorkflowByFilter( filt );
+	
+	                for ( ResourceWorkflow resource : listResource )
+	                {
+	                    try
+	                    {
+	                        _chooseStateTask.chooseNewState( resource.getIdResource( ), resource.getResourceType( ), task, config, workflow.getId( ), resource
+	                                .getState( ).getId( ) );
+	                    }
+	                    catch( Exception e )
+	                    {
+	                        AppLogService.error( "Unexpected Error", e );
+	                    }
+	                }
                 }
             }
         }
